@@ -2,7 +2,7 @@ import express, {type Request, type Response, Router} from "express";
 import fs from "node:fs";
 import { apodObj } from "../model/apodObj";
 import { journalEntry } from "../model/journalEntry";
-import {getToday, getMultiple, getSpecific} from "../services/dataHandler";
+import { getRandom, getMultiple, getSpecific } from "../services/dataHandler";
 
 class APODController {
     private app;
@@ -38,6 +38,11 @@ class APODController {
 
         });
 
+        this.router.get('/apod/random/:count', async (req: Request<{ count: number }>, res: Response) => {
+            let data: journalEntry[] = await getRandom(req.params.count);
+            res.send(data);
+        });
+
         this.router.get('/apod/interval/', async (req: Request, res: Response) => {
 
             const start = req.query.start;
@@ -53,8 +58,8 @@ class APODController {
             let data: journalEntry[] = await getMultiple(<string>start, <string>end);
             console.log(data);
 
-            if (typeof pagStart === "string" || typeof pagEnd === "string" && (pagStart.length() > 0 && pagEnd.length() > 0))
-                data.slice(parseInt(pagStart) - 1, parseInt(pagEnd) - 1);
+            if (typeof pagStart === "string" || typeof pagEnd === "string")
+                data = data.slice(parseInt(pagStart) - 1, parseInt(pagEnd));
 
             res.send(data);
         })
