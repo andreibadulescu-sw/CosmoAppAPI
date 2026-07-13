@@ -11,5 +11,5 @@ export async function getSpecific(date: string = "2026-07-12") {
 export async function getMultiple(startDate: string, endDate: string) {
     let data: apodObj[];
     await axios.get('https://api.nasa.gov/planetary/apod?start_date=' + startDate + '&end_date=' + endDate + '&api_key=OLk6ZuBriusz0z3IX1O4nfLkMG7L5Hfh5hqyQAvO').then(res => { data = res.data; console.log(data); }).catch(err => console.log(err));
-    return data.map(entry => { new journalEntry(entry.date, entry.explanation, entry.title, entry.url); });
+    return data.map(entry => { return new journalEntry(entry.date, entry.explanation, entry.title, entry.url); });
 }

@@ -42,7 +42,20 @@ class APODController {
 
             const start = req.query.start;
             const end = req.query.end;
+            const pagStart = req.query.pagStart;
+            const pagEnd = req.query.pagEnd;
+
+            if (typeof start !== "string" || typeof end !== "string") {
+                res.send("Invalid request!");
+                return;
+            }
+
             let data: journalEntry[] = await getMultiple(<string>start, <string>end);
+            console.log(data);
+
+            if (typeof pagStart === "string" || typeof pagEnd === "string" && (pagStart.length() > 0 && pagEnd.length() > 0))
+                data.slice(parseInt(pagStart) - 1, parseInt(pagEnd) - 1);
+
             res.send(data);
         })
     }
