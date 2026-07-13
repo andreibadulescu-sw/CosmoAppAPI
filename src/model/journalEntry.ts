@@ -11,3 +11,4 @@ export class journalEntry {
         this.url = url;
     }
 }
+
