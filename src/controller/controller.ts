@@ -26,21 +26,29 @@ class APODController {
     private initializeRouter() {
         this.router.get('/apod/today', async (req, res) => {
 
-            let data: journalEntry[] = await getSpecific();
+            let now = new Date();
+            let data: journalEntry[] = await getSpecific(`${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`);
             res.send(data);
 
         });
 
-        this.router.get('/apod/date/:date', async (req: Request<{ date: string }>, res: Response) => {
+        this.router.get('/apod/date/:date', async (req: Request<{ userDate: string }>, res: Response) => {
 
-            let data: journalEntry[] = await getSpecific(req.params.date);
+            let data: journalEntry[] = await getSpecific(req.params.userDate);
             res.send(data);
 
         });
 
         this.router.get('/apod/random/:count', async (req: Request<{ count: number }>, res: Response) => {
+
+            if (req.params.count < 1) {
+                res.send("Invalid request!");
+                return;
+            }
+
             let data: journalEntry[] = await getRandom(req.params.count);
             res.send(data);
+
         });
 
         this.router.get('/apod/interval/', async (req: Request, res: Response) => {
@@ -58,8 +66,13 @@ class APODController {
             let data: journalEntry[] = await getMultiple(<string>start, <string>end);
             console.log(data);
 
-            if (typeof pagStart === "string" || typeof pagEnd === "string")
-                data = data.slice(parseInt(pagStart) - 1, parseInt(pagEnd));
+            if (typeof pagStart === "string" && typeof pagEnd === "string") {
+                let lhs = parseInt(pagStart) - 1;
+                let rhs = parseInt(pagEnd) - 1;
+
+                if (lhs >= 0 && lhs < data.length() && rhs > lhs && rhs <= data.length())
+                    data = data.slice(lhs, rhs + 1);
+            }
 
             res.send(data);
         })
